@@ -6,20 +6,16 @@ get_backpacks <- function(string){
 	backpack_strings <- lapply(string, \(x){l <- nchar(x); l1 <- floor(l/2); c(first = substr(x, 1, l1), second = substr(x, l1+1, l))})
 	backpack_lists <- lapply(backpack_strings, strsplit, split = "")
 	backpack_sets <- lapply(backpack_lists, 
-													\(x){
-														list(fo = setdiff(x[["first"]], x[["second"]]),
-																 so = setdiff(x[["second"]], x[["first"]]),
-																 both = intersect(x[["second"]], x[["first"]]))
-													}
+													\(x){intersect(x[["second"]], x[["first"]])}
 	)
 }
 
 get_priority_from_set <- function(x){
-	sum(c(match(x, letters, nomatch=0), match(x, LETTERS, nomatch = -26) + 26))
+	sum(match(x, c(letters, LETTERS), nomatch=0))
 }
 
 backpack_sets <- get_backpacks(backpacks)
-backpack_priority <- lapply(backpack_sets, \(x){get_priority_from_set(x[["both"]])})
+backpack_priority <- lapply(backpack_sets, get_priority_from_set)
 
 sprintf("The priority of all backpacks is %d", sum(unlist(backpack_priority)))
 
