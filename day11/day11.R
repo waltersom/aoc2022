@@ -1,5 +1,7 @@
 library(dplyr)
 library(stringr)
+# library(gmp)
+library(pracma)
 
 input_data <- readLines("day11/input.txt")
 
@@ -21,11 +23,13 @@ do_round <- function(monkey_df, start_item_allocation, divide_factor = 3){
 	for(ind in monkey_df[["index"]]){
 		
 		items <- start_item_allocation[[ind]]
-		for(item in items){
+		for(ii in seq_along(items)){
+			item <- items[[ii]]
 			worry_level <- within(list(old = item), eval(parse(text = monkey_df[ind, "op"])))[["new"]]
 			if(divide_factor != 1){
 				worry_level <- floor(worry_level/divide_factor)
 			}
+			worry_level <- worry_level %% Reduce(Lcm, x = monkey_df$test)
 			if(worry_level %% monkey_df[ind, "test"] == 0){
 				#Give to true
 				start_item_allocation[[monkey_df[ind, "true"]]] <- c(start_item_allocation[[monkey_df[ind, "true"]]], worry_level)
@@ -54,5 +58,5 @@ ans <- do_rounds(monkey_df, monkey_items, n=20)
 ans[["monkey_df"]] |> pull(items_inspected) |> sort() |> tail(n=2) |> as.list() |> do.call(what = `*`, args = _)
 						
 
-# ans2 <- do_rounds(monkey_df, monkey_items, n=20, divide_factor = 1)
-# ans2[["monkey_df"]] |> pull(items_inspected) |> sort() |> tail(n=2) |> as.list() |> do.call(what = `*`, args = _)
+ans2 <- do_rounds(monkey_df, monkey_items, n=10000, divide_factor = 1)
+ans2[["monkey_df"]] |> pull(items_inspected) |> sort() |> tail(n=2) |> as.list() |> do.call(what = `*`, args = _)
